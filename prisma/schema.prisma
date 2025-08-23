@@ -1,0 +1,44 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Restaurant {
+  //  pk @id [e o default vai ser aleatorio]
+  id           String     @id @default(uuid())
+  Name         String
+  ImagemUrl    String
+  //  esse db.decimal é par apadronizer e dizer que antes da casa eu vou ter 10 depois vou ter 2
+  DeliveryFree Decimal    @db.Decimal(10, 2)
+  DeliveryTime Int
+  categories   Category[]
+  products     Product[]
+}
+
+model Category {
+  id          String       @id @default(uuid())
+  Name        String
+  ImagemUrl   String
+  restaurants Restaurant[]
+  products    Product[]
+}
+
+model Product {
+  id                 String     @id @default(uuid())
+  Name               String
+  ImagemUrl          String
+  Description        String
+  Price              Decimal    @db.Decimal(10, 2)
+  DiscountPercentage Int        @default(0)
+  RestaurantId       String
+  restaurants        Restaurant @relation(fields: [RestaurantId], references: [id])
+  CategoryId         String
+  // fields é a categoryId que vai ter relacionamento com o id da proprica category
+  categories         Category   @relation(fields: [CategoryId], references: [id])
+}
+
